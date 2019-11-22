@@ -7,8 +7,21 @@ library(ggplot2)
 library(Hmisc)
 library(clusterProfiler)
 library(scCorrNet)
+library(knitr)
+library(cowplot)
+library(diptest)
+library(markdown)
 indir <- 'D:/Gu_lab/HCCsc/HCCsc_new/data/Hcc_bulk_DEGene/Multi_data/HCCDB-1/'
 outdir <- 'D:/Gu_lab/HCCsc/HCCsc_new/result/scCorrNet/HCCDB1/'
 expr = BulkDataInit(paste0(indir,'GSE22058-GPL6793.gene.txt'), paste0(indir,'GSE22058.sample.txt'), CellType = 'HCC', Genelistfile = 'none', IfSaveFile = T, SaveFileDir = paste0(outdir,'expr.csv'))
-results <- ConditionCorrNet(expr$exprMatrix,expr$genelist,sampleNum = 10, sampleSize = 100,orderScore = 'dis',IfSaveFile = T, saveFile = paste0(outdir,'results.txt'))
 
+#test small data
+small_exprMatrix<- expr$exprMatrix[1:100,1:100]
+results <-runScCorrNet(exprMatrix = small_exprMatrix,
+                       geneList = expr$genelist,
+                       sampleNum = 10,
+                       sampleSize = 100,
+                       disMethod = 'spearman',
+                       pairNum = 10000 ,
+                       orderScore = 'dis',
+                       savePath = outdir)

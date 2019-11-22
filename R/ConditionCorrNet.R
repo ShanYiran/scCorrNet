@@ -44,7 +44,7 @@ ConditionCorrNet <- function(exprMatrix,geneList,sampleNum = 10, sampleSize = 10
   dis_sorted_value <- cor_dis[orderGenePair]
   results <- cbind(gene1,gene2,p_sorted_value,dis_sorted_value)
   if(IfSaveFile==T){
-    write.table(results,saveFile,quote = F,sep = '\t',row.names = F,col.names = T)
+    write.table(results,paste0(saveFile,'results.txt'),quote = F,sep = '\t',row.names = F,col.names = T)
   }
   return(results)
 }

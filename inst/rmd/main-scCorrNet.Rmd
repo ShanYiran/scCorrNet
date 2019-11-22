@@ -1,0 +1,113 @@
+---
+title: "scCorrNet"
+author: "G-Lab"
+date: "2019/11/21"
+output: html_document
+---
+
+<style type="text/css">
+    body{
+        font-size: 15px;
+        line-height: 22px;
+    }
+    h1.title {
+        font-size: 38px;
+    }
+    h1 {
+        font-size: 28px;
+        margin-top: 23px;
+    }
+    h2 {
+        font-size: 24px;
+        margin-top: 25px;
+    }
+    h3 {
+      font-size: 20px;
+        margin-top: 25px;
+    }
+    code.r{
+        font-size: 13px;
+    }
+    pre {
+        font-size: 14px;
+    }
+    p {
+        margin-top:10px;
+        margin-bottom:10px;
+    }
+    table { 
+        width: 60%;
+        border-collapse: collapse;
+        font-family: Futura, Arial, sans-serif;
+    }
+    th,td {
+        padding: 5px;
+    }
+    th,td {
+        border-bottom: 1px solid #ddd;
+        border-top: 1px solid #ddd;
+        padding-right: 20px
+    }
+</style>
+
+
+```{r setting, include=FALSE}
+options(knitr.table.format = "html") 
+options(scipen=10)
+knitr::opts_chunk$set(echo = TRUE, fig.path = file.path(results$savePath, 'report-figures//'))
+title <- "scCorrNet"
+if(!is.null(results$sampleName)){
+  title <- paste0(results$sampleName, "  -  ", title)
+}
+if(!is.null(results$authorName)){
+  userName <- results$authorName
+}else{
+  userName <- Sys.getenv("USERNAME")
+}
+reportMark <- Sys.time()
+if(userName != ""){
+  reportMark <- paste0(userName, " , ", reportMark)
+}
+h.i <- 1
+h.ii <- 1
+```
+
+
+# `r title`
+--------------------------------
+<p align="right">`r reportMark`</p>
+
+
+
+
+## `r h.i` Read data
+Enrichment results.
+
+
+```{r go.dot.plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+results$EnrichPlots$go.dot
+```
+<p align="right">(Hi-res image: <a href="./report-figures/go_dotPlot.png">view</a>)</p>
+
+
+```{r go.bar.plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+results$EnrichPlots$go.bar
+```
+<p align="right">(Hi-res image: <a href="./report-figures/go_barPlot.png">view</a>)</p>
+
+```{r kegg.dot.plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+results$EnrichPlots$kegg.dot
+```
+<p align="right">(Hi-res image: <a href="./report-figures/kegg_dotPlot.png">view</a>)</p>
+
+
+
+```{r echo=F}
+h.i <- h.i + 1
+```
+
+
+<br>
+
+--------------------------------------
+&copy; [G-Lab](http://lifeome.net/glab/jgu/),   [Tsinghua University](http://www.tsinghua.edu.cn)
