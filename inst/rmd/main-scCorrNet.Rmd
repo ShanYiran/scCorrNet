@@ -100,6 +100,17 @@ results$EnrichPlots$kegg.dot
 ```
 <p align="right">(Hi-res image: <a href="./report-figures/kegg_dotPlot.png">view</a>)</p>
 
+```{r pvalue_plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+results$genePair$hist_pvalue
+```
+<p align="right">(Hi-res image: <a href="./report-figures/hist_pvalue.png">view</a>)</p>
+
+```{r disvalue_plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+results$genePair$hist_disvalue
+```
+<p align="right">(Hi-res image: <a href="./report-figures/hist_disvalue.png">view</a>)</p>
+
+
 
 
 ```{r echo=F}

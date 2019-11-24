@@ -14,7 +14,15 @@
 #' @export
 #'
 #' @examples
-ConditionCorrNet <- function(exprMatrix,geneList,sampleNum = 10, sampleSize = 100,disMethod = 'spearman', pairNum = 'auto' ,orderScore = 'dis',IfSaveFile = F, saveFile = 'none'){
+ConditionCorrNet <- function(exprMatrix,
+                             geneList,
+                             sampleNum = 10,
+                             sampleSize = 100,
+                             disMethod = 'spearman',
+                             pairNum = 'auto',
+                             orderScore = 'dis',
+                             IfSaveFile = F,
+                             savePath = 'none'){
   p_value <- matrix(data = 0,nrow = dim(exprMatrix)[1],ncol = dim(exprMatrix)[1])
   p_value[lower.tri(p_value)] = NA
   cor_dis <- matrix(data = 0,nrow = dim(exprMatrix)[1],ncol = dim(exprMatrix)[1])
@@ -44,9 +52,32 @@ ConditionCorrNet <- function(exprMatrix,geneList,sampleNum = 10, sampleSize = 10
   dis_sorted_value <- cor_dis[orderGenePair]
   results <- cbind(gene1,gene2,p_sorted_value,dis_sorted_value)
   if(IfSaveFile==T){
-    write.table(results,paste0(saveFile,'results.txt'),quote = F,sep = '\t',row.names = F,col.names = T)
+    write.table(results,paste0(savePath,'results.txt'),quote = F,sep = '\t',row.names = F,col.names = T)
   }
-  return(results)
+  #------------plot p_value / dis_cor hist----------
+  if(!dir.exists(file.path(savePath, 'report-figures/'))){
+    dir.create(file.path(savePath, 'report-figures/'), recursive = T)
+  }
+  hist_pvalue <- as.vector(p_value)
+  hist_pvalue <- hist_pvalue[!is.na(hist_pvalue)]
+  #hist plot
+  p_thre <- 0.05
+  p.results <- list()
+  p.results[['hist_pvalue']] <- ggplot()+aes(x = hist_pvalue) +
+    geom_histogram(bins = 200, fill = "#a788ab") +
+    labs(x = "p_value", y = "Gene pair number")
+  ggsave(filename = file.path(savePath, "report-figures/hist_pvalue.png"),p.results[['hist_pvalue']],
+         width = 6, height = 6, dpi = 800)
+
+  hist_disvalue <- as.vector(cor_dis)
+  hist_disvalue <- hist_disvalue[!is.na(hist_disvalue)]
+  #hist plot
+  p.results[['hist_disvalue']] <- ggplot()+aes(x = hist_disvalue) +
+    geom_histogram(bins = 200, fill = "#a788ab") +
+    labs(x = "dis_value", y = "Gene pair number")
+  ggsave(filename = file.path(savePath, "report-figures/hist_disvalue.png"), p.results[['hist_disvalue']],
+         width = 6, height = 6, dpi = 800)
+  return(list(results = results,p.results = p.results))
 }
 #' Title
 #'
@@ -63,7 +94,7 @@ Enrichment <- function(genePairResults,
     dir.create(file.path(savePath, 'report-figures/'), recursive = T)
   }
   p.results <- list()
-  gl <- c(results[,1],results[,2])
+  gl <- c(genePairResults[,1],genePairResults[,2])
   gene <- bitr(gl, fromType = "SYMBOL",toType = c("ENTREZID","ENSEMBL"),OrgDb = "org.Hs.eg.db")
   gene <- gene$ENTREZID
   gene[duplicated(gene)]
@@ -110,7 +141,7 @@ runScCorrNet <- function(exprMatrix,
   results <- as.list(environment())
   results[["savePath"]] <- savePath
   #------------Condition Network-----------
-  genePair <- ConditionCorrNet(exprMatrix = exprMatrix,
+  CCresults <- ConditionCorrNet(exprMatrix = exprMatrix,
                                geneList = geneList,
                                sampleNum = sampleNum,
                                sampleSize = sampleSize,
@@ -118,9 +149,12 @@ runScCorrNet <- function(exprMatrix,
                                pairNum = pairNum ,
                                orderScore = orderScore,
                                IfSaveFile = T,
-                               savePath)
-  results[["genePair"]] <- genePair
+                               savePath = savePath)
+  #print(head(CCresults))
+  genePair <- CCresults$results
+  results[["genePair"]] <- CCresults$p.results
   #------------Enrichment------------
+  message("[", Sys.time(), "] START: RUN EnrichPlots")
   results[["EnrichPlots"]] <- Enrichment(genePairResults = genePair,
                           savePath = savePath)
 
