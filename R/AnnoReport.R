@@ -6,9 +6,8 @@
 #' @param sampleSize
 #' @param disMethod
 #' @param pairNum
+#' @param savePath
 #' @param orderScore
-#' @param IfSaveFile
-#' @param saveFile
 #'
 #' @return
 #' @export
@@ -21,7 +20,6 @@ ConditionCorrNet <- function(exprMatrix,
                              disMethod = 'spearman',
                              pairNum = 'auto',
                              orderScore = 'dis',
-                             IfSaveFile = F,
                              savePath = 'none'){
   p_value <- matrix(data = 0,nrow = dim(exprMatrix)[1],ncol = dim(exprMatrix)[1])
   p_value[lower.tri(p_value)] = NA
@@ -51,28 +49,21 @@ ConditionCorrNet <- function(exprMatrix,
   p_sorted_value <- p_value[orderGenePair]
   dis_sorted_value <- cor_dis[orderGenePair]
   results <- cbind(gene1,gene2,p_sorted_value,dis_sorted_value)
-  if(IfSaveFile==T){
-    write.table(results,paste0(savePath,'results.txt'),quote = F,sep = '\t',row.names = F,col.names = T)
-  }
-  #------------plot p_value / dis_cor hist----------
+  results <- as.data.frame(results)
+   #------------plot p_value / dis_cor hist----------
   if(!dir.exists(file.path(savePath, 'report-figures/'))){
     dir.create(file.path(savePath, 'report-figures/'), recursive = T)
   }
-  hist_pvalue <- as.vector(p_value)
-  hist_pvalue <- hist_pvalue[!is.na(hist_pvalue)]
   #hist plot
   p_thre <- 0.05
   p.results <- list()
-  p.results[['hist_pvalue']] <- ggplot()+aes(x = hist_pvalue) +
+  p.results[['hist_pvalue']] <- ggplot(data = results,aes(x = as.numeric(results$p_sorted_value))) +
     geom_histogram(bins = 200, fill = "#a788ab") +
     labs(x = "p_value", y = "Gene pair number")
   ggsave(filename = file.path(savePath, "report-figures/hist_pvalue.png"),p.results[['hist_pvalue']],
          width = 6, height = 6, dpi = 800)
-
-  hist_disvalue <- as.vector(cor_dis)
-  hist_disvalue <- hist_disvalue[!is.na(hist_disvalue)]
   #hist plot
-  p.results[['hist_disvalue']] <- ggplot()+aes(x = hist_disvalue) +
+  p.results[['hist_disvalue']] <- ggplot(data = results,aes(x =as.numeric(results$dis_sorted_value) )) +
     geom_histogram(bins = 200, fill = "#a788ab") +
     labs(x = "dis_value", y = "Gene pair number")
   ggsave(filename = file.path(savePath, "report-figures/hist_disvalue.png"), p.results[['hist_disvalue']],
@@ -82,6 +73,7 @@ ConditionCorrNet <- function(exprMatrix,
 #' Title
 #'
 #' @param genePairResults
+#' @param savePath
 #'
 #' @return
 #' @export
@@ -94,7 +86,7 @@ Enrichment <- function(genePairResults,
     dir.create(file.path(savePath, 'report-figures/'), recursive = T)
   }
   p.results <- list()
-  gl <- c(genePairResults[,1],genePairResults[,2])
+  gl <- c(genePairResults$gene1,genePairResults$gene2)
   gene <- bitr(gl, fromType = "SYMBOL",toType = c("ENTREZID","ENSEMBL"),OrgDb = "org.Hs.eg.db")
   gene <- gene$ENTREZID
   gene[duplicated(gene)]
@@ -112,6 +104,37 @@ Enrichment <- function(genePairResults,
   return(p.results)
 }
 
+#' Title
+#'
+#' @param genePairResults
+#' @param P_value_thre
+#' @param Corr_dis_thre
+#' @param savePath
+#'
+#' @return
+#' @export
+#'
+#' @examples
+ShowCorrScore <- function(genePairResults,P_value_thre = 0.05, Corr_dis_thre = 0.25, savePath){
+  savePath <- normalizePath(savePath, "/")
+  if(!dir.exists(file.path(savePath, 'report-figures/'))){
+    dir.create(file.path(savePath, 'report-figures/'), recursive = T)
+  }
+  genePairResults$p_sorted_value <- as.numeric(genePairResults$p_sorted_value)
+  genePairResults$dis_sorted_value <- as.numeric(genePairResults$dis_sorted_value)
+
+  genePairResults$Is_P <- (genePairResults$p_sorted_value <= P_value_thre)
+  genePairResults$Is_dis <- (genePairResults$dis_sorted_value >= Corr_dis_thre | genePairResults$dis_sorted_value <= -Corr_dis_thre)
+  all_plot_cell <- (genePairResults$Is_P==TRUE & genePairResults$Is_dis==TRUE)
+  p.results <- list()
+  #print(head(genePairResults))
+  all_plot_cell <- (genePairResults$Is_P==TRUE & genePairResults$Is_dis==TRUE)
+  p.results[["CorrScore"]] <- ggplot(data = genePairResults,mapping = aes(x = dis_sorted_value,y = p_sorted_value,colour = all_plot_cell)) + geom_point()
+  ggsave(plot =  p.results[["CorrScore"]],filename = file.path(savePath, "report-figures/ShowCorrScore.png"),
+         width = 5, height = 7, dpi = 800)
+  return(list(results = genePairResults,p.results = p.results))
+}
+
 
 #' Title
 #'
@@ -124,6 +147,8 @@ Enrichment <- function(genePairResults,
 #' @param pairNum
 #' @param orderScore
 #' @param savePath
+#' @param P_value_thre
+#' @param Corr_dis_thre
 #'
 #' @return
 #' @export
@@ -133,6 +158,8 @@ runScCorrNet <- function(exprMatrix,
                          geneList,
                          sampleNum = 10,
                          sampleSize = 100,
+                         P_value_thre = 0.05,
+                         Corr_dis_thre = 0.25,
                          disMethod = 'spearman',
                          pairNum = 'auto' ,
                          orderScore = 'dis',
@@ -148,7 +175,6 @@ runScCorrNet <- function(exprMatrix,
                                disMethod = disMethod,
                                pairNum = pairNum ,
                                orderScore = orderScore,
-                               IfSaveFile = T,
                                savePath = savePath)
   #print(head(CCresults))
   genePair <- CCresults$results
@@ -157,6 +183,19 @@ runScCorrNet <- function(exprMatrix,
   message("[", Sys.time(), "] START: RUN EnrichPlots")
   results[["EnrichPlots"]] <- Enrichment(genePairResults = genePair,
                           savePath = savePath)
+  #------------plot Corr Score------------
+  message("[", Sys.time(), "] START: RUN ShowCorrScore")
+  tm <- ShowCorrScore(genePairResults = genePair,
+                      P_value_thre = P_value_thre,
+                      Corr_dis_thre = Corr_dis_thre,
+                      savePath = savePath)
+
+  genePair <- tm$results
+  results[["CorrScorePlot"]] <- tm$p.results
+  rm(tm)
+
+  #------------save results------------
+  write.table(genePair,paste0(savePath,'results.txt'),quote = F,sep = '\t',row.names = F,col.names = T)
 
   #------------report-------------
   message("[", Sys.time(), "] -----: report generating")

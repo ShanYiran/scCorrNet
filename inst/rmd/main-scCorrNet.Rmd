@@ -110,6 +110,10 @@ results$genePair$hist_disvalue
 ```
 <p align="right">(Hi-res image: <a href="./report-figures/hist_disvalue.png">view</a>)</p>
 
+```{r ShowCorrScores, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+results$CorrScorePlot
+```
+<p align="right">(Hi-res image: <a href="./report-figures/ShowCorrScore.png">view</a>)</p>
 
 
 
