@@ -84,18 +84,18 @@ h.ii <- 1
 Enrichment results.
 
 
-```{r go.dot.plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+```{r go.dot.plot, echo=F, message=F, warning=F, dpi=500, fig.width=8, fig.height=11, fig.align="center", out.width='80%'}
 results$EnrichPlots$go.dot
 ```
 <p align="right">(Hi-res image: <a href="./report-figures/go_dotPlot.png">view</a>)</p>
 
 
-```{r go.bar.plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+```{r go.bar.plot, echo=F, message=F, warning=F, dpi=500, fig.width=8, fig.height=11, fig.align="center", out.width='80%'}
 results$EnrichPlots$go.bar
 ```
 <p align="right">(Hi-res image: <a href="./report-figures/go_barPlot.png">view</a>)</p>
 
-```{r kegg.dot.plot, echo=F, message=F, warning=F, dpi=500, fig.width=5, fig.height=4, fig.align="center", out.width='80%'}
+```{r kegg.dot.plot, echo=F, message=F, warning=F, dpi=500, fig.width=8, fig.height=11, fig.align="center", out.width='80%'}
 results$EnrichPlots$kegg.dot
 ```
 <p align="right">(Hi-res image: <a href="./report-figures/kegg_dotPlot.png">view</a>)</p>

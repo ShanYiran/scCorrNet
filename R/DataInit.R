@@ -13,7 +13,7 @@
 TenxDataInit <- function(exprMatrix, Genelistfile = 'none',
                          IfSaveFile = F, SaveFileDir = 'none'){
   if(Genelistfile=='none'){
-    genelist <- read.table(system.file("rds", "Gene_list_all_with_init.txt", package = "scCorrNet"))
+    genelist <- read.table(system.file("txt", "Gene_list_all_with_init.txt", package = "scCorrNet"))
   }
   else genelist <- read.table(Genelistfile)
   genelist <- genelist[[1]]

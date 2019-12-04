@@ -93,14 +93,14 @@ Enrichment <- function(genePairResults,
   go <- enrichGO(gene, OrgDb = org.Hs.eg.db, ont = 'ALL',pAdjustMethod = 'BH',pvalueCutoff = 0.05,qvalueCutoff = 0.2,keyType = 'ENTREZID')
   p.results[["go.dot"]] <- dotplot(go,showCategory = 50)
   ggsave(filename = file.path(savePath, "report-figures/go_dotPlot.png"), p.results[["go.dot"]],
-         width = 6, height = 6, dpi = 800)
-  p.results[["go.bar"]] <- barplot(go,showCategory=20,drop=T)
+         width = 8.5, height = 11, dpi = 800)
+  p.results[["go.bar"]] <- barplot(go,showCategory=50,drop=T)
   ggsave(filename = file.path(savePath, "report-figures/go_barPlot.png"), p.results[["go.bar"]],
-         width = 6, height = 6, dpi = 800)
+         width = 8.5, height = 11, dpi = 800)
   kegg <- enrichKEGG(gene,organism = 'hsa', keyType = 'kegg', pvalueCutoff = 0.05,pAdjustMethod = 'BH', minGSSize = 10,maxGSSize = 500,qvalueCutoff = 0.2,use_internal_data = FALSE)
-  p.results[["kegg.dot"]] <- barplot(kegg,showCategory=20,drop=T)
+  p.results[["kegg.dot"]] <- barplot(kegg,showCategory=50,drop=T)
   ggsave(filename = file.path(savePath, "report-figures/kegg_barPlot.png"), p.results[["kegg.dot"]],
-         width = 6, height = 6, dpi = 800)
+         width = 8.5, height = 11, dpi = 800)
   return(p.results)
 }
 
@@ -134,6 +134,8 @@ ShowCorrScore <- function(genePairResults,P_value_thre = 0.05, Corr_dis_thre = 0
          width = 5, height = 7, dpi = 800)
   return(list(results = genePairResults,p.results = p.results))
 }
+
+
 
 
 #' Title
