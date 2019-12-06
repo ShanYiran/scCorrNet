@@ -12,8 +12,11 @@
 #'
 TenxDataInit <- function(exprMatrix, Genelistfile = 'none',
                          IfSaveFile = F, SaveFileDir = 'none'){
-  if(Genelistfile=='none'){
+  if(Genelistfile=='auto'){
     genelist <- read.table(system.file("txt", "Gene_list_all_with_init.txt", package = "scCorrNet"))
+  }
+  else if(Genelistfile=='none'){
+    genelist <- c(list(rownames(exprMatrix)))
   }
   else genelist <- read.table(Genelistfile)
   genelist <- genelist[[1]]
@@ -42,8 +45,11 @@ BulkDataInit <- function(exprFile, sampleFile, CellType = 'HCC', Genelistfile = 
   expr <- read.table(exprFile,sep = '\t',stringsAsFactors = F)
   message("[", Sys.time(), "] -----: " ,dim(expr)[1],' ',dim(expr)[2])
   sample <- sample[1:2,sample[2,]==CellType]
-  if(Genelistfile=='none'){
+  if(Genelistfile=='auto'){
     genelist <- read.table(system.file("txt", "Gene_list_all_with_init.txt", package = "scCorrNet"))
+  }
+  else if(Genelistfile=='none'){
+    genelist <- c(list(expr[,2]))
   }
   else genelist <- read.table(Genelistfile)
   genelist <- genelist[[1]]
@@ -59,6 +65,13 @@ BulkDataInit <- function(exprFile, sampleFile, CellType = 'HCC', Genelistfile = 
   if(IfSaveFile == TRUE){
     write.csv(exprMatrix,file = SaveFileDir,quote = F,col.names = T,row.names = T)
   }
+  #use seurat to scale var gene
+  seu_expr <- CreateSeuratObject(exprMatrix)
+  seu_expr <- NormalizeData(seu_expr)
+  seu_expr <- FindVariableFeatures(seu_expr, selection.method = "vst", nfeatures = 2000)
+  seu_expr <- ScaleData(seu_expr,features = VariableFeatures(seu_expr))
+  expr_tenX = TenxDataInit(exprMatrix = seu_expr@assays$RNA@scale.data , IfSaveFile = T, SaveFileDir = paste0(outdir,'expr.csv'))
+  exprMatrix<- expr_tenX$exprMatrix
   return(list(exprMatrix = exprMatrix, genelist = genelist))
 }
 

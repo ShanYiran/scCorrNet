@@ -13,16 +13,15 @@ library(diptest)
 library(markdown)
 library(reshape)
 library(tidyr)
+library(plyr)
 
 indir <- 'D:/Gu_lab/HCCsc/HCCsc_new/data/Hcc_bulk_DEGene/Multi_data/HCCDB-1/'
 outdir <- 'D:/Gu_lab/HCCsc/HCCsc_new/result/scCorrNet/HCCDB1/'
 expr = BulkDataInit(paste0(indir,'GSE22058-GPL6793.gene.txt'), paste0(indir,'GSE22058.sample.txt'), CellType = 'HCC', Genelistfile = 'none', IfSaveFile = T, SaveFileDir = paste0(outdir,'expr.csv'))
-
 #test small data
-small_exprMatrix<- expr$exprMatrix
-
-results <-runScCorrNet(exprMatrix = small_exprMatrix,
-                       geneList = expr$genelist,
+exprMatrix<- expr_HCCDB1$exprMatrix
+results <-runScCorrNet(exprMatrix = exprMatrix,
+                       geneList = expr_HCCDB1$genelist,
                        sampleNum = 10,
                        sampleSize = 100,
                        P_value_thre = 0.05,
@@ -31,6 +30,8 @@ results <-runScCorrNet(exprMatrix = small_exprMatrix,
                        pairNum = 50000 ,
                        orderScore = 'dis',
                        savePath = outdir)
+
+
 indir <- 'D:/Gu_lab/HCCsc/HCCsc_new/data/Hcc_bulk_DEGene/Multi_data/HCCDB-3/'
 outdir <- 'D:/Gu_lab/HCCsc/HCCsc_new/result/scCorrNet/HCCDB3/'
 expr = BulkDataInit(paste0(indir,'GSE25097.gene.txt'), paste0(indir,'GSE25097.sample.txt'), CellType = 'HCC', Genelistfile = 'none', IfSaveFile = T, SaveFileDir = paste0(outdir,'expr.csv'))

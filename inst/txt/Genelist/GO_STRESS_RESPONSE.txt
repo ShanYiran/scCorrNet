@@ -1,0 +1,19 @@
+GO_STRESS_RESPONSE_TO_METAL_ION
+> Any process that results in a change in state or activity of a cell or an organism (in terms of movement, secretion, enzyme production, gene expression, etc.) as a result of a disturbance in organismal or cellular homeostasis caused by a metal ion stimulus. [GOC:kmv]
+ATP7A
+HSPA5
+MT1A
+MT1B
+MT1DP
+MT1E
+MT1F
+MT1G
+MT1H
+MT1HL1
+MT1M
+MT1X
+MT2A
+MT3
+MT4
+PARK7
+SLC30A1

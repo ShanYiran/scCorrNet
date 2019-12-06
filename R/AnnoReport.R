@@ -38,6 +38,9 @@ ConditionCorrNet <- function(exprMatrix,
   }
   p_value <- p_value/sampleNum
   cor_dis <- cor_dis/sampleNum
+  if(pairNum == 'none'){
+    pairNum = 50000
+  }
   if(orderScore=='p_value'){
     orderGenePair <- arrayInd(sort.list(p_value,decreasing = F)[1:min(dim(exprMatrix)[1]*(dim(exprMatrix)[1]-1)/2, pairNum)],dim(p_value))
   }
@@ -135,7 +138,32 @@ ShowCorrScore <- function(genePairResults,P_value_thre = 0.05, Corr_dis_thre = 0
   return(list(results = genePairResults,p.results = p.results))
 }
 
-
+GeneListAna <- function(gene_pair_results,select_type = 'auto',genelistpath = 'none',savePath){
+  savePath <- normalizePath(savePath, "/")
+  if(!dir.exists(file.path(savePath, 'report-figures/'))){
+    dir.create(file.path(savePath, 'report-figures/'), recursive = T)
+  }
+  if(genelistpath=='none'){
+    file_names <- list.files(system.file("txt", "Genelist", package = "scCorrNet"))
+  }
+  else file_names <- list.files(genelistpath)
+  gl_nl <- data.frame() #name list of gene list
+  name_list <- list()
+  gpList <- c(gene_pair_results$gene1,gene_pair_results$gene2)
+  for(i in 1:length(file_names)){
+    name <-gsub(".txt","",file_names[i])
+    name_list <- c(name_list,name)
+    gl <- read.table(system.file("txt", "Genelist", file_names[i],package = "scCorrNet"),sep = "\t",header = TRUE,stringsAsFactors = FALSE)
+    gl <- gl[,1]
+    gl <- gl[2:length(gl)]
+    gp_in_gl <- intersect(gpList,gl)
+    gl_nl <- plyr::rbind.fill(as.data.frame(gl_nl),as.data.frame(t(gp_in_gl)))
+  }
+  gl_nl <- t(gl_nl)
+  colnames(gl_nl) <- name_list
+  write.table(gl_nl,paste0(savePath,'GO_enrich_gl.txt'),quote = F,sep = '\t',row.names = F,col.names = T)
+  return(gl_nl)
+}
 
 
 #' Title
@@ -158,12 +186,13 @@ ShowCorrScore <- function(genePairResults,P_value_thre = 0.05, Corr_dis_thre = 0
 #' @examples
 runScCorrNet <- function(exprMatrix,
                          geneList,
+                         GO_genelis = 'none',
                          sampleNum = 10,
                          sampleSize = 100,
                          P_value_thre = 0.05,
                          Corr_dis_thre = 0.25,
                          disMethod = 'spearman',
-                         pairNum = 'auto' ,
+                         pairNum = 'auto',
                          orderScore = 'dis',
                          savePath){
   message("[", Sys.time(), "] START: RUN ScCorrNet")
@@ -191,7 +220,13 @@ runScCorrNet <- function(exprMatrix,
                       P_value_thre = P_value_thre,
                       Corr_dis_thre = Corr_dis_thre,
                       savePath = savePath)
+  #------------Gene Go enrich-------------
+  message("[", Sys.time(), "] START: RUN GeneListAna")
+  gl_nl <- GeneListAna(gene_pair_results = genePair,
+                       genelistpath = GO_genelis,
+                       savePath = savePath)
 
+  #---------------------------------------
   genePair <- tm$results
   results[["CorrScorePlot"]] <- tm$p.results
   rm(tm)

@@ -1,0 +1,22 @@
+GO_RESPONSE_TO_INTERFERON_ALPHA
+> Any process that results in a change in state or activity of a cell or an organism (in terms of movement, secretion, enzyme production, gene expression, etc.) as a result of an interferon-alpha stimulus. Interferon-alpha is a type I interferon. [GOC:sl, PMID:11356686]
+ADAR
+AXL
+BST2
+EIF2AK2
+GAS6
+GATA3
+IFIT2
+IFIT3
+IFITM1
+IFITM2
+IFITM3
+IFNAR1
+IFNAR2
+KLHL20
+LAMP3
+MX2
+PDE12
+PYHIN1
+STAR
+TPR
